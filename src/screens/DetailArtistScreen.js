@@ -1,4 +1,6 @@
-import { Text, SafeAreaView, StyleSheet, View, Image, FlatList } from 'react-native';
+import React from 'react';
+import { Text, SafeAreaView, StyleSheet, View, Image, FlatList, TouchableOpacity } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 
 const getImage = (imagePath) => {
   switch (imagePath) {
@@ -29,9 +31,14 @@ const getImage = (imagePath) => {
   }
 };
 
-const DetailArtistScreen = ({ navigation, route }) => {
+const DetailArtistScreen = ({ route }) => {
+  const navigation = useNavigation();
   const { item } = route.params;
+  const openMusicPlayer = (song) => { 
+    navigation.navigate('MusicPlayerScreen', { song: song });
+  };
   const renderSongItem = ({ item }) => (
+     <TouchableOpacity style={styles.songCart} onPress={() => openMusicPlayer(item)}>
     <View style={styles.songItem}>
       <Image style={styles.songImage} source={getImage(item.image)} />
       <View style={styles.songDetails}>
@@ -39,14 +46,19 @@ const DetailArtistScreen = ({ navigation, route }) => {
         <Text style={styles.songAuthor}>{item.author}</Text>
       </View>
     </View>
+     </TouchableOpacity>
   );
+
   return (
     <SafeAreaView style={styles.container}>
+      <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+        <Text style={styles.backButtonText}>Back</Text>
+      </TouchableOpacity>
       <View style={styles.top}>
         <Image style={styles.img} source={getImage(item.avatar)} />
         <Text style={styles.artistName}>{item.name}</Text>
       </View>
-     <FlatList
+      <FlatList
         data={item.listsong}
         keyExtractor={song => song.id}
         renderItem={renderSongItem}
@@ -60,24 +72,37 @@ export default DetailArtistScreen;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 50,
+    padding: 20,
     backgroundColor: 'black',
+  },
+  backButton: {
+    position: 'absolute',
+    top: 500, // Adjusted top position
+    left: 20,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)', // Semi-transparent background
+    padding: 10,
+    borderRadius: 5,
+    zIndex: 1, // Ensure the button is above other content
+  },
+  backButtonText: {
+    color: 'white',
+    fontSize: 18,
   },
   top: {
     alignItems: 'center',
-    paddingVertical: 20, // Thêm padding để tạo không gian cho tên
-    borderRadius: 15, // Bo góc cho phần trên
+    paddingVertical: 20,
+    borderRadius: 15,
   },
   img: {
     width: "90%",
-    height: 200, // Đặt chiều cao cụ thể cho hình ảnh
-    borderRadius: 15, // Bo góc cho hình ảnh
+    height: 200,
+    borderRadius: 15,
   },
   artistName: {
     fontSize: 24,
     fontWeight: 'bold',
     color: 'white',
-    marginTop: 10, // Khoảng cách giữa hình ảnh và tên
+    marginTop: 10,
   },
   songItem: {
     flexDirection: 'row',

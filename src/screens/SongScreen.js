@@ -16,9 +16,9 @@ const getImage = (imagePath) => {
       return require('../images/songs/neulucdo.jpg');
     case 'tayto.jpg':
       return require('../images/songs/tayto.jpg');
-       case '22.jpg':
+    case '22.jpg':
       return require('../images/songs/22.jpg');
-      case 'Bai3.jpg':
+    case 'Bai3.jpg':
       return require('../images/songs/Bai3.jpg');
     default:
       return require('../images/songs/bai2.jpg');
@@ -30,17 +30,15 @@ const SongScreen = ({ navigation }) => {
   const [favorites, setFavorites] = useState([]);
   const [searchText, setSearchText] = useState('');
 
-  // Hàm toggleFavorite
   const toggleFavorite = async (item) => {
     const isFavorite = favorites.includes(item.id);
     const updatedFavorites = isFavorite
-      ? favorites.filter(fav => fav !== item.id) // Xóa khỏi danh sách yêu thích
-      : [...favorites, item.id]; // Thêm vào danh sách yêu thích
+      ? favorites.filter(fav => fav !== item.id) 
+      : [...favorites, item.id]; 
 
     setFavorites(updatedFavorites);
 
-    // Cập nhật trạng thái heart trong API
-    const updatedSong = { ...item, heart: !isFavorite }; // Đảo ngược trạng thái heart
+    const updatedSong = { ...item, heart: !isFavorite };
 
     try {
       const response = await fetch(`${API_URL}/${item.id}`, {
@@ -54,29 +52,23 @@ const SongScreen = ({ navigation }) => {
       if (!response.ok) {
         throw new Error('Failed to update song');
       }
+      refetch();  // Refetch to update data
     } catch (error) {
       console.error(error);
-      // Hoàn tác trạng thái yêu thích nếu cập nhật thất bại
       setFavorites(prevFavorites => (isFavorite ? [...prevFavorites, item.id] : prevFavorites.filter(fav => fav !== item.id)));
     }
   };
 
-  const addToPlaylist = (song) => {
-    navigation.navigate('PlaylistScreen', { initialPlaylist: [song] });
+  const openMusicPlayer = (song) => {
+    navigation.navigate('MusicPlayerScreen', { song: song });
   };
 
-  useFocusEffect(
-    React.useCallback(() => {
-      refetch();  
-    }, [refetch])
-  );
-
   if (loading) {
-    return <ActivityIndicator size="large" color="blue" />; 
+    return <ActivityIndicator size="large" color="blue" />;
   }
 
   if (error) {
-    return <Text>Error fetching data...</Text>; 
+    return <Text>Error fetching data...</Text>;
   }
 
   const filteredSongs = songs.filter(song => 
@@ -96,35 +88,29 @@ const SongScreen = ({ navigation }) => {
         />
       </View>
       <FlatList
-    data={filteredSongs}
-    keyExtractor={item => item.id}
-    renderItem={({ item }) => (
-      <TouchableOpacity 
-        style={styles.songCart} 
-        onPress={() => addToPlaylist(item)}
-      >
-        <Image style={styles.image} source={getImage(item.image)} />
-        <View style={styles.textContainer}>
-          <Text style={styles.songName}>{item.name}</Text>
-          <Text style={styles.author}>{item.author}</Text>
-        </View>
-        <TouchableOpacity style={styles.heartContainer} onPress={() => toggleFavorite(item)}>
-          <Entypo name="heart" size={28} color={item.heart ? "red" : "white"} />
-        </TouchableOpacity>
-      </TouchableOpacity>
-    )}
-  />
+        data={filteredSongs}
+        keyExtractor={item => item.id}
+        renderItem={({ item }) => (
+          <TouchableOpacity style={styles.songCart} onPress={() => openMusicPlayer(item)}>
+            <Image style={styles.image} source={getImage(item.image)} />
+            <View style={styles.textContainer}>
+              <Text style={styles.songName}>{item.name}</Text>
+              <Text style={styles.author}>{item.author}</Text>
+            </View>
+            <TouchableOpacity style={styles.heartContainer} onPress={() => toggleFavorite(item)}>
+              <Entypo name="heart" size={28} color={item.heart ? "red" : "white"} />
+            </TouchableOpacity>
+          </TouchableOpacity>
+        )}
+      />
     </SafeAreaView>
   );
 };
-
-export default SongScreen;
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: 'black',
-    padding: 20,
   },
   header: {
     fontSize: 40,
@@ -145,14 +131,16 @@ const styles = StyleSheet.create({
   search: {
     backgroundColor: "#131624",
     padding: 10,
-    marginHorizontal: "auto",
+    marginLeft: "auto",
+    marginRight: "auto",
     width: '80%',
     borderRadius: 25,
+    alignItems: "center",
+    justifyContent: "center",
     flexDirection: "row",
     marginVertical: 10,
     borderColor: "#C0C0C0",
     borderWidth: 0.8,
-    alignItems: "center",
   },
   songCart: {
     flexDirection: 'row',
@@ -173,18 +161,17 @@ const styles = StyleSheet.create({
     marginLeft: 10,
   },
   songName: {
+    fontSize: 18,
     color: 'white',
-    fontSize: 15,
     fontWeight: 'bold',
   },
   author: {
-    color: 'white',
-    fontSize: 15,
+    fontSize: 14,
+    color: '#C0C0C0',
   },
   heartContainer: {
-    marginLeft: 10,
-    padding: 5,
-    borderRadius: 20,
-    backgroundColor: 'rgba(255, 0, 0, 0.1)',
+    paddingLeft: 10,
   },
 });
+
+export default SongScreen;
