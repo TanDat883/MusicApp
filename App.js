@@ -10,6 +10,7 @@ import PlaylistScreen from './src/screens/PlaylistScreen';
 import FavoriteScreen from './src/screens/FavoriteScreen';
 import DetailArtistScreen from './src/screens/DetailArtistScreen';
 import DetailPlaylistScreen from './src/screens/DetailPlaylistScreen';
+import MusicPlayerScreen from './src/screens/MusicPlayerScreen';
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
 
@@ -109,6 +110,7 @@ export default function App() {
         <Stack.Screen name="Main" component={BottomTabs} options={{ headerShown: false }} />
         <Stack.Screen name="DetailArtistScreen" component={DetailArtistScreen} options={{ headerShown: false }} />
         <Stack.Screen name="DetailPlaylistScreen" component={DetailPlaylistScreen} options={{ headerShown: false }} />
+         <Stack.Screen name="MusicPlayerScreen" component={MusicPlayerScreen} options={{ headerShown: false }} />
       </Stack.Navigator>
     </NavigationContainer>
   );
